@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: card-game-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123456
+      POSTGRES_DB: card_game
+    ports:
+      - "5432:5432"
+    volumes:
+      - card-game-data:/var/lib/postgresql/data
+
+volumes:
+  card-game-data:
