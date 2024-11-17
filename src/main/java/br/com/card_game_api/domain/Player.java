@@ -1,23 +1,30 @@
 package br.com.card_game_api.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
+/**
+ * Representa um jogador no jogo de cartas.
+ * Cada jogador possui um identificador e uma pontuação.
+ */
 @Entity
+@Table(name = "players")
 public class Player {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
-    private String name;
+    @Column(nullable = false, length = 20)
+    private String identifier; // Identificador do jogador (Jogador 1, Jogador 2, etc.)
 
-    private int score;
+    @Column(nullable = false)
+    private int score; // Pontuação do jogador
 
-    public Player(String name, int score) {
-        this.name = name;
+    public Player() {}
+
+    public Player(String identifier, int score) {
+        this.identifier = identifier;
         this.score = score;
     }
 
@@ -29,12 +36,12 @@ public class Player {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getIdentifier() {
+        return identifier;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setIdentifier(String identifier) {
+        this.identifier = identifier;
     }
 
     public int getScore() {
