@@ -14,6 +14,12 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
+
+/**
+ * Classe responsável pela interação com a API externa de baralho (Deck of Cards API).
+ * Esta classe fornece métodos para criar um deck, distribuir cartas e outras operações relacionadas
+ * ao gerenciamento do baralho utilizando a API externa.
+ */
 @Component
 public class DeckOfCardsClient {
 
