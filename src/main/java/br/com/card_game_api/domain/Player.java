@@ -21,11 +21,15 @@ public class Player {
     @Column(nullable = false)
     private int score; // Pontuação do jogador
 
+    @Column(nullable = false)
+    private String hand; // Mão de cartas do jogador como uma string concatenada
+
     public Player() {}
 
-    public Player(String identifier, int score) {
+    public Player(String identifier, int score, String hand) {
         this.identifier = identifier;
         this.score = score;
+        this.hand = hand;
     }
 
     public Long getId() {
@@ -50,6 +54,14 @@ public class Player {
 
     public void setScore(int score) {
         this.score = score;
+    }
+
+    public String getHand() {
+        return hand;
+    }
+
+    public void setHand(String hand) {
+        this.hand = hand;
     }
 
 }
