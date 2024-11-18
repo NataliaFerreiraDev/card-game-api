@@ -185,4 +185,13 @@ public class CardGameService {
                 .orElseThrow(() -> new IllegalArgumentException("Jogo não encontrado com ID: " + gameId));
     }
 
+    /**
+     * Recupera todos os históricos de jogos registrados no banco de dados.
+     *
+     * @return Lista de todos os históricos de jogos
+     */
+    public List<GameHistory> getAllGameHistories() {
+        return gameHistoryRepository.findAll();
+    }
+
 }
