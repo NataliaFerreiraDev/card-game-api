@@ -117,13 +117,25 @@ public class CardGameService {
      */
     private int calculateScore(List<CardDTO> cardDTOs) {
         Map<String, Integer> cardValues = Map.of(
-                "A", 1, "K", 13, "Q", 12, "J", 11
+                "ACE", 1,
+                "JACK", 11,
+                "QUEEN", 12,
+                "KING", 13
         );
 
         return cardDTOs.stream()
                 .mapToInt(card -> {
-                    String value = card.getValue();
-                    return cardValues.getOrDefault(value, Integer.parseInt(value));
+                    String value = card.getValue().toUpperCase(); // Trata valores como case-insensitive
+                    // Verifica se o valor é uma carta nomeada ou um número
+                    if (cardValues.containsKey(value)) {
+                        return cardValues.get(value);
+                    } else {
+                        try {
+                            return Integer.parseInt(value); // Tenta converter números
+                        } catch (NumberFormatException e) {
+                            throw new IllegalArgumentException("Valor inválido de carta: " + value, e);
+                        }
+                    }
                 })
                 .sum();
     }
