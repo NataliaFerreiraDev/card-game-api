@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 public class GameHistoryDTO {
 
     private Long id;
-    private int playerCount;
+    private int numberOfPlayers;
     private int cardsPerPlayer;
     private String deckId;
     private String winner;
@@ -19,14 +19,14 @@ public class GameHistoryDTO {
     }
 
     public GameHistoryDTO(Long id,
-                          int playerCount,
+                          int numberOfPlayers,
                           int cardsPerPlayer,
                           String deckId,
                           String winner,
                           int highestScore,
                           LocalDateTime gameTimestamp) {
         this.id = id;
-        this.playerCount = playerCount;
+        this.numberOfPlayers = numberOfPlayers;
         this.cardsPerPlayer = cardsPerPlayer;
         this.deckId = deckId;
         this.winner = winner;
@@ -42,12 +42,12 @@ public class GameHistoryDTO {
         this.id = id;
     }
 
-    public int getPlayerCount() {
-        return playerCount;
+    public int getNumberOfPlayers() {
+        return numberOfPlayers;
     }
 
-    public void setPlayerCount(int playerCount) {
-        this.playerCount = playerCount;
+    public void setNumberOfPlayers(int numberOfPlayers) {
+        this.numberOfPlayers = numberOfPlayers;
     }
 
     public int getCardsPerPlayer() {
