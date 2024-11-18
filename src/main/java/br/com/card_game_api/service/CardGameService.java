@@ -174,4 +174,15 @@ public class CardGameService {
         return gameHistory;
     }
 
+    /**
+     * Recupera o histórico de um jogo pelo ID.
+     *
+     * @param gameId O ID do jogo
+     * @return O histórico do jogo
+     */
+    public GameHistory getGameHistoryById(Long gameId) {
+        return gameHistoryRepository.findById(gameId)
+                .orElseThrow(() -> new IllegalArgumentException("Jogo não encontrado com ID: " + gameId));
+    }
+
 }
