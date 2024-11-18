@@ -2,6 +2,7 @@ package br.com.card_game_api.controller;
 
 import br.com.card_game_api.domain.GameHistory;
 import br.com.card_game_api.dto.GameHistoryDTO;
+import br.com.card_game_api.dto.GameRequestDTO;
 import br.com.card_game_api.service.CardGameService;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
@@ -28,12 +29,14 @@ public class GameController {
     /**
      * Endpoint para iniciar um novo jogo.
      *
-     * @param numPlayers   Número de jogadores
-     * @param cardsPerHand Número de cartas por jogador
-     * @return Resposta com o histórico do jogo e status HTTP
+     * @param gameRequestDTO Objeto que contém o número de jogadores (numPlayers) e o número de cartas por jogador (cardsPerHand).
+     * @return Resposta contendo o histórico do jogo em formato DTO e o status HTTP 201 (Criado), caso o jogo seja iniciado com sucesso.
      */
     @PostMapping("/play")
-    public ResponseEntity<GameHistoryDTO> playGame(@RequestParam int numPlayers, @RequestParam int cardsPerHand) {
+    public ResponseEntity<GameHistoryDTO> playGame(@RequestBody GameRequestDTO gameRequestDTO) {
+        int numPlayers = gameRequestDTO.getNumPlayers();
+        int cardsPerHand = gameRequestDTO.getCardsPerHand();
+
         GameHistory gameHistory = cardGameService.playGame(numPlayers, cardsPerHand);
 
         GameHistoryDTO gameHistoryDTO = modelMapper.map(gameHistory, GameHistoryDTO.class);
