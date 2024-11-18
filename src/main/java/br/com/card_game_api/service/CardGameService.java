@@ -1,12 +1,15 @@
 package br.com.card_game_api.service;
 
 import br.com.card_game_api.adapter.outbound.DeckOfCardsClient;
+import br.com.card_game_api.domain.CardSuit;
+import br.com.card_game_api.domain.CardValue;
 import br.com.card_game_api.domain.GameHistory;
 import br.com.card_game_api.domain.Player;
 import br.com.card_game_api.dto.CardDTO;
 import br.com.card_game_api.repository.GameHistoryRepository;
 import br.com.card_game_api.repository.PlayerRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -39,6 +42,7 @@ public class CardGameService {
      * @param cardsPerHand Número de cartas por jogador
      * @return Histórico do jogo registrado
      */
+    @Transactional
     public GameHistory playGame(int numPlayers, int cardsPerHand) {
         validateInputs(numPlayers, cardsPerHand);
 
@@ -94,17 +98,42 @@ public class CardGameService {
 
             int score = calculateScore(cardDTOs);
 
-            String handString = cardDTOs.stream()
-                    .map(card -> card.getValue() + " of " + card.getSuit())
-                    .collect(Collectors.joining(", "));
+            String handString = buildHandString(cardDTOs);
 
             Player player = new Player("Jogador " + i, score, handString);
-            playerRepository.save(player); // Salva o jogador no banco
-
             players.add(player);
         }
 
         return players;
+    }
+
+    /**
+     * Constrói a string representando a mão do jogador com cartas traduzidas.
+     *
+     * @param cardDTOs Lista de cartas do jogador
+     * @return String com as cartas traduzidas
+     */
+    private String buildHandString(List<CardDTO> cardDTOs) {
+        return cardDTOs.stream()
+                .map(card -> getTranslatedCardValue(card.getValue()) + " de " +
+                        CardSuit.fromString(card.getSuit()).getTranslatedSuit())
+                .collect(Collectors.joining(", "));
+    }
+
+    /**
+     * Obtém o valor traduzido da carta.
+     * Se for um valor numérico, retorna o número como string.
+     *
+     * @param cardValue Valor da carta
+     * @return Valor traduzido da carta
+     */
+    private String getTranslatedCardValue(String cardValue) {
+        try {
+            CardValue value = CardValue.fromString(cardValue);
+            return value.getTranslatedValue();
+        } catch (IllegalArgumentException e) {
+            return cardValue;
+        }
     }
 
     /**
@@ -125,13 +154,12 @@ public class CardGameService {
 
         return cardDTOs.stream()
                 .mapToInt(card -> {
-                    String value = card.getValue().toUpperCase(); // Trata valores como case-insensitive
-                    // Verifica se o valor é uma carta nomeada ou um número
+                    String value = card.getValue().toUpperCase();
                     if (cardValues.containsKey(value)) {
                         return cardValues.get(value);
                     } else {
                         try {
-                            return Integer.parseInt(value); // Tenta converter números
+                            return Integer.parseInt(value);
                         } catch (NumberFormatException e) {
                             throw new IllegalArgumentException("Valor inválido de carta: " + value, e);
                         }
@@ -181,9 +209,23 @@ public class CardGameService {
                 highestScore,
                 LocalDateTime.now()
         );
-        gameHistoryRepository.save(gameHistory);
+        gameHistory = gameHistoryRepository.save(gameHistory);
+
+        savePlayers(players, gameHistory);
 
         return gameHistory;
+    }
+
+    /**
+     * Salva os jogadores no banco de dados, associando-os ao histórico do jogo.
+     *
+     * @param players Lista de jogadores com suas cartas distribuídas
+     * @param gameHistory O histórico do jogo que deve ser associado aos jogadores
+     */
+    private void savePlayers(List<Player> players, GameHistory gameHistory) {
+        players.forEach(player -> player.setGameHistory(gameHistory));
+
+        playerRepository.saveAll(players);
     }
 
     /**
