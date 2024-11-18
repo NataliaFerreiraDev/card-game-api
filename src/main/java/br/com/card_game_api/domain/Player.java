@@ -24,6 +24,10 @@ public class Player {
     @Column(nullable = false)
     private String hand; // Mão de cartas do jogador como uma string concatenada
 
+    @ManyToOne
+    @JoinColumn(name = "game_history_id", nullable = false)
+    private GameHistory gameHistory; // Associacao com o jogo
+
     public Player() {}
 
     public Player(String identifier, int score, String hand) {
@@ -62,6 +66,14 @@ public class Player {
 
     public void setHand(String hand) {
         this.hand = hand;
+    }
+
+    public GameHistory getGameHistory() {
+        return gameHistory;
+    }
+
+    public void setGameHistory(GameHistory gameHistory) {
+        this.gameHistory = gameHistory;
     }
 
 }
