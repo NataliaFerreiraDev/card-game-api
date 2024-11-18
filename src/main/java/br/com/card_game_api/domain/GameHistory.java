@@ -3,6 +3,8 @@ package br.com.card_game_api.domain;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Representa o histórico de um jogo de cartas.
@@ -17,7 +19,7 @@ public class GameHistory {
     private Long id;
 
     @Column(nullable = false)
-    private int playerCount; // Quantidade de jogadores
+    private int numberOfPlayers; // Quantidade de jogadores
 
     @Column(nullable = false)
     private int cardsPerPlayer; // Quantidade de cartas por jogador
@@ -34,10 +36,13 @@ public class GameHistory {
     @Column(nullable = false)
     private LocalDateTime gameTimestamp; // Data e hora do jogo
 
+    @OneToMany(mappedBy = "gameHistory", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Player> players = new ArrayList<>();
+
     public GameHistory() {}
 
-    public GameHistory(int playerCount, int cardsPerPlayer, String deckId, String winner, int highestScore, LocalDateTime gameTimestamp) {
-        this.playerCount = playerCount;
+    public GameHistory(int numberOfPlayers, int cardsPerPlayer, String deckId, String winner, int highestScore, LocalDateTime gameTimestamp) {
+        this.numberOfPlayers = numberOfPlayers;
         this.cardsPerPlayer = cardsPerPlayer;
         this.deckId = deckId;
         this.winner = winner;
@@ -53,12 +58,12 @@ public class GameHistory {
         this.id = id;
     }
 
-    public int getPlayerCount() {
-        return playerCount;
+    public int getNumberOfPlayers() {
+        return numberOfPlayers;
     }
 
-    public void setPlayerCount(int playerCount) {
-        this.playerCount = playerCount;
+    public void setNumberOfPlayers(int numberOfPlayers) {
+        this.numberOfPlayers = numberOfPlayers;
     }
 
     public int getCardsPerPlayer() {
@@ -99,6 +104,19 @@ public class GameHistory {
 
     public void setGameTimestamp(LocalDateTime gameTimestamp) {
         this.gameTimestamp = gameTimestamp;
+    }
+
+    public List<Player> getPlayers() {
+        return players;
+    }
+
+    public void setPlayers(List<Player> players) {
+        this.players = players;
+    }
+
+    public void addPlayer(Player player) {
+        player.setGameHistory(this);
+        this.players.add(player);
     }
 
 }
