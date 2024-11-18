@@ -115,8 +115,8 @@ public class GameHistory {
     }
 
     public void addPlayer(Player player) {
-        player.setGameHistory(this);
         this.players.add(player);
+        player.setGameHistory(this);
     }
 
 }
