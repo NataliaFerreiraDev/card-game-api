@@ -1,6 +1,5 @@
 package br.com.card_game_api.dto;
 
-
 import jakarta.validation.constraints.NotNull;
 
 /**
@@ -17,13 +16,17 @@ public class PlayerDTO {
     @NotNull
     private int score;
 
+    @NotNull
+    private String hand;
+
     public PlayerDTO() {
     }
 
-    public PlayerDTO(Long id, String identifier, int score) {
+    public PlayerDTO(Long id, String identifier, int score, String hand) {
         this.id = id;
         this.identifier = identifier;
         this.score = score;
+        this.hand = hand;
     }
 
     public Long getId() {
@@ -49,4 +52,13 @@ public class PlayerDTO {
     public void setScore(int score) {
         this.score = score;
     }
+
+    public String getHand() {
+        return hand;
+    }
+
+    public void setHand(String hand) {
+        this.hand = hand;
+    }
+
 }
