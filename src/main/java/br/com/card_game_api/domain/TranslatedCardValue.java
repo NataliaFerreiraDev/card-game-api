@@ -1,6 +1,6 @@
 package br.com.card_game_api.domain;
 
-public enum CardValue {
+public enum TranslatedCardValue {
     ACE("Ás"),
     KING("Rei"),
     QUEEN("Rainha"),
@@ -8,7 +8,7 @@ public enum CardValue {
 
     private final String translatedValue;
 
-    CardValue(String translatedValue) {
+    TranslatedCardValue(String translatedValue) {
         this.translatedValue = translatedValue;
     }
 
@@ -16,10 +16,10 @@ public enum CardValue {
         return translatedValue;
     }
 
-    public static CardValue fromString(String value) {
-        for (CardValue cardValue : CardValue.values()) {
-            if (cardValue.name().equalsIgnoreCase(value)) {
-                return cardValue;
+    public static TranslatedCardValue fromString(String value) {
+        for (TranslatedCardValue translatedCardValue : TranslatedCardValue.values()) {
+            if (translatedCardValue.name().equalsIgnoreCase(value)) {
+                return translatedCardValue;
             }
         }
         throw new IllegalArgumentException("Valor de carta inválido: " + value);

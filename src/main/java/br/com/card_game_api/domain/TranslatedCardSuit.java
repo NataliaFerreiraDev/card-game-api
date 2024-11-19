@@ -1,6 +1,6 @@
 package br.com.card_game_api.domain;
 
-public enum CardSuit {
+public enum TranslatedCardSuit {
     HEARTS("Copas"),
     SPADES("Espadas"),
     DIAMONDS("Ouros"),
@@ -8,7 +8,7 @@ public enum CardSuit {
 
     private final String translatedSuit;
 
-    CardSuit(String translatedSuit) {
+    TranslatedCardSuit(String translatedSuit) {
         this.translatedSuit = translatedSuit;
     }
 
@@ -16,10 +16,10 @@ public enum CardSuit {
         return translatedSuit;
     }
 
-    public static CardSuit fromString(String suit) {
-        for (CardSuit cardSuit : CardSuit.values()) {
-            if (cardSuit.name().equalsIgnoreCase(suit)) {
-                return cardSuit;
+    public static TranslatedCardSuit fromString(String suit) {
+        for (TranslatedCardSuit translatedCardSuit : TranslatedCardSuit.values()) {
+            if (translatedCardSuit.name().equalsIgnoreCase(suit)) {
+                return translatedCardSuit;
             }
         }
         throw new IllegalArgumentException("Naipe inválido: " + suit);
