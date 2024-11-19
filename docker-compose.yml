@@ -1,4 +1,18 @@
 services:
+  card-game-api:
+    build: .
+    container_name: card-game-api
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/card_game
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: 123456
+    networks:
+      - card-game-network
+
   postgres:
     image: postgres:15
     container_name: card-game-postgres
@@ -11,6 +25,12 @@ services:
       - "5432:5432"
     volumes:
       - card-game-data:/var/lib/postgresql/data
+    networks:
+      - card-game-network
 
 volumes:
   card-game-data:
+
+networks:
+  card-game-network:
+    driver: bridge
