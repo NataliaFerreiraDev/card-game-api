@@ -4,6 +4,7 @@ import br.com.card_game_api.domain.GameHistory;
 import br.com.card_game_api.dto.GameHistoryDTO;
 import br.com.card_game_api.dto.GameRequestDTO;
 import br.com.card_game_api.service.CardGameService;
+import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,7 +34,7 @@ public class GameController {
      * @return Resposta contendo o histórico do jogo em formato DTO e o status HTTP 201 (Criado), caso o jogo seja iniciado com sucesso.
      */
     @PostMapping("/play")
-    public ResponseEntity<GameHistoryDTO> playGame(@RequestBody GameRequestDTO gameRequestDTO) {
+    public ResponseEntity<GameHistoryDTO> playGame(@Valid @RequestBody GameRequestDTO gameRequestDTO) {
         int numPlayers = gameRequestDTO.getNumPlayers();
         int cardsPerHand = gameRequestDTO.getCardsPerHand();
 
@@ -73,7 +74,11 @@ public class GameController {
                 .map(gameHistory -> modelMapper.map(gameHistory, GameHistoryDTO.class))
                 .toList();
 
-        return new ResponseEntity<>(gameHistoryDTOs, HttpStatus.OK);
+        if (gameHistoryDTOs.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(gameHistoryDTOs);
     }
 
 }
