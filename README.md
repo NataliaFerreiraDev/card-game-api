@@ -132,10 +132,11 @@ Inicia um novo jogo, informando o número de jogadores e o número de cartas por
 - `numPlayers` (inteiro, obrigatório): Número de jogadores no jogo (mínimo 1).
 - `cardsPerHand` (inteiro, obrigatório): Número de cartas distribuídas para cada jogador (mínimo 1).
 
-```markdown
-### Exemplo de Requisição:
 
-**URL:** `POST http://localhost:8080/game/play`
+### Exemplo de Requisição:
+```markdown
+POST http://localhost:8080/game/play
+```
 
 **Corpo da Requisição:**
 
@@ -174,10 +175,11 @@ Consulta o histórico de um jogo específico, identificado pelo ID do jogo.
 #### Parâmetros de Entrada:
 - `gameId` (inteiro, obrigatório): ID único do jogo.
 
-``markdown
 ### Exemplo de Requisição:
 
-**URL:** `GET /game/history/1`
+```markdown
+GET http://localhost:8080/game/history/1
+```
 
 #### Parâmetros de Saída:
 - `id` (inteiro): ID único do jogo.
@@ -207,10 +209,10 @@ Consulta o histórico de todos os jogos realizados.
 #### Parâmetros de Entrada:
 - Nenhum.
 
-``markdown
 ### Exemplo de Requisição:
-
-**URL:** `GET /game/history`
+```markdown
+GET http://localhost:8080/game/history/
+```
 
 #### Parâmetros de Saída:
 - `games` (array de objetos): Lista do histórico dos jogos.
