@@ -1,10 +1,7 @@
 package br.com.card_game_api.service;
 
 import br.com.card_game_api.adapter.outbound.DeckOfCardsClient;
-import br.com.card_game_api.domain.CardSuit;
-import br.com.card_game_api.domain.CardValue;
-import br.com.card_game_api.domain.GameHistory;
-import br.com.card_game_api.domain.Player;
+import br.com.card_game_api.domain.*;
 import br.com.card_game_api.dto.CardDTO;
 import br.com.card_game_api.repository.GameHistoryRepository;
 import br.com.card_game_api.repository.PlayerRepository;
@@ -14,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -63,11 +59,8 @@ public class CardGameService {
      * @param cardsPerHand Número de cartas por jogador
      */
     private void validateInputs(int numPlayers, int cardsPerHand) {
-        if (numPlayers <= 0) {
-            throw new IllegalArgumentException("O número de jogadores deve ser maior que zero.");
-        }
-        if (cardsPerHand <= 0) {
-            throw new IllegalArgumentException("O número de cartas por jogador deve ser maior que zero.");
+        if (numPlayers < 1 || cardsPerHand < 1) {
+            throw new IllegalArgumentException("Número de jogadores ou cartas por mão inválido.");
         }
     }
 
@@ -116,7 +109,7 @@ public class CardGameService {
     private String buildHandString(List<CardDTO> cardDTOs) {
         return cardDTOs.stream()
                 .map(card -> getTranslatedCardValue(card.getValue()) + " de " +
-                        CardSuit.fromString(card.getSuit()).getTranslatedSuit())
+                        TranslatedCardSuit.fromString(card.getSuit()).getTranslatedSuit())
                 .collect(Collectors.joining(", "));
     }
 
@@ -129,7 +122,7 @@ public class CardGameService {
      */
     private String getTranslatedCardValue(String cardValue) {
         try {
-            CardValue value = CardValue.fromString(cardValue);
+            TranslatedCardValue value = TranslatedCardValue.fromString(cardValue);
             return value.getTranslatedValue();
         } catch (IllegalArgumentException e) {
             return cardValue;
@@ -145,26 +138,8 @@ public class CardGameService {
      * @return A pontuação do jogador
      */
     private int calculateScore(List<CardDTO> cardDTOs) {
-        Map<String, Integer> cardValues = Map.of(
-                "ACE", 1,
-                "JACK", 11,
-                "QUEEN", 12,
-                "KING", 13
-        );
-
         return cardDTOs.stream()
-                .mapToInt(card -> {
-                    String value = card.getValue().toUpperCase();
-                    if (cardValues.containsKey(value)) {
-                        return cardValues.get(value);
-                    } else {
-                        try {
-                            return Integer.parseInt(value);
-                        } catch (NumberFormatException e) {
-                            throw new IllegalArgumentException("Valor inválido de carta: " + value, e);
-                        }
-                    }
-                })
+                .mapToInt(CardValue::getScoreFromCardDTO)
                 .sum();
     }
 

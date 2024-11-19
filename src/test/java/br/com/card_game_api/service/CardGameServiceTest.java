@@ -73,11 +73,11 @@ class CardGameServiceTest {
         // Act & Assert
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
                 () -> cardGameService.playGame(numPlayers, cardsPerHand));
-        assertEquals("O número de jogadores deve ser maior que zero.", exception.getMessage());
+        assertEquals("Número de jogadores ou cartas por mão inválido.", exception.getMessage());
     }
 
     @Test
-    void validateInputs_ShouldThrowExceptionWhenCardsPerHandIsZero() {
+    void validateInputs_ShouldThrowExceptionWhenCardVaueIsInvalid() {
         // Arrange
         int numPlayers = 2;
         int cardsPerHand = 5;
@@ -90,11 +90,11 @@ class CardGameServiceTest {
         // Act & Assert
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
                 () -> cardGameService.playGame(numPlayers, cardsPerHand));
-        assertEquals("Valor inválido de carta: " + "ACES", exception.getMessage());
+        assertEquals("Valor inválido para a carta: " + "ACES", exception.getMessage());
     }
 
     @Test
-    void calculateScore_shouldThrowIllegalArgumentExceptionWhenInvalidCardValueIsProvided() {
+    void calculateScore_shouldThrowIllegalArgumentExceptionWhenInvalidValueIsProvided() {
         // Arrange
         int numPlayers = 2;
         int cardsPerHand = 0;
@@ -102,7 +102,7 @@ class CardGameServiceTest {
         // Act & Assert
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
                 () -> cardGameService.playGame(numPlayers, cardsPerHand));
-        assertEquals("O número de cartas por jogador deve ser maior que zero.", exception.getMessage());
+        assertEquals("Número de jogadores ou cartas por mão inválido.", exception.getMessage());
     }
 
     @Test
