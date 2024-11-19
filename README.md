@@ -52,8 +52,6 @@ Outras cartas numéricas possuem seu próprio valor, conforme o número impresso
 
 ## Como Rodar o Projeto
 
-## Como Rodar o Projeto
-
 ### Pré-requisitos
 
 Antes de rodar o projeto, você precisa ter o **Docker** e o **Docker Compose** instalados no seu ambiente local. Não é necessário instalar Java, Maven ou PostgreSQL, pois esses serviços serão gerenciados automaticamente pelos containers Docker.
@@ -111,6 +109,19 @@ No **Swagger**, você poderá:
 - Consultar as rotas disponíveis.
 - Ver exemplos de requisição e resposta.
 - Interagir diretamente com a API para testar os endpoints.
+
+
+### 5. Monitoramento e Métricas com Spring Actuator
+
+Este projeto utiliza o **Spring Actuator** para fornecer métricas e informações sobre o estado de saúde da aplicação.
+O **Spring Actuator** é uma excelente ferramenta para monitoramento e observabilidade, facilitando a visualização
+do comportamento da aplicação em produção.
+Neste projeto, o seguinte endpoint está disponível:
+- **/actuator/health**: Exibe o estado de saúde da aplicação (UP, DOWN, etc.). Este endpoint é útil para monitorar se a aplicação está funcionando corretamente.
+
+```bash
+http://localhost:8080/actuator/health
+```
 
 ## Endpoints
 
