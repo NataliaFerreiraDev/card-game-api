@@ -1,9 +1,12 @@
 package br.com.card_game_api.service;
 
+import org.springframework.stereotype.Service;
+
 /**
  * Classe responsável por validar os dados de entrada fornecidos pelos adaptadores de entrada.
  * Segue o princípio da responsabilidade única, isolando a lógica de validação.
  */
+@Service
 public class InputValidator {
 
     /**

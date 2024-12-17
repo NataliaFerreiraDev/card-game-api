@@ -5,11 +5,11 @@ import br.com.card_game_api.domain.GameHistory;
 import br.com.card_game_api.dto.CardDTO;
 import br.com.card_game_api.repository.GameHistoryRepository;
 import br.com.card_game_api.repository.PlayerRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
@@ -18,6 +18,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class CardGameServiceTest {
 
     @Mock
@@ -32,14 +33,12 @@ class CardGameServiceTest {
     @Mock
     private InputValidator inputValidator;
 
+    @Mock
+    private DeckCalculatorService deckCalculatorService;
+
     @Autowired
     @InjectMocks
     private CardGameService cardGameService;
-
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-    }
 
     @Test
     void playGame_ShouldSaveGameHistoryAndReturnIt() {
@@ -49,6 +48,7 @@ class CardGameServiceTest {
         String deckId = "deck123";
 
         doNothing().when(inputValidator).validateInputs(numPlayers, cardsPerHand);
+        when(deckCalculatorService.calculateDecks(numPlayers, cardsPerHand)).thenReturn(1); // Mock do deckCalculatorService
         when(deckOfCardsClient.createDeck(anyInt())).thenReturn(deckId);
         when(deckOfCardsClient.dealCards(deckId, cardsPerHand))
                 .thenReturn(List.of(new CardDTO("ACE", "HEARTS"),
@@ -66,6 +66,7 @@ class CardGameServiceTest {
         assertEquals(numPlayers, result.getNumberOfPlayers());
         assertEquals(cardsPerHand, result.getCardsPerPlayer());
         verify(playerRepository, times(1)).saveAll(anyList());
+        verify(deckCalculatorService, times(1)).calculateDecks(numPlayers, cardsPerHand);
     }
 
     @Test

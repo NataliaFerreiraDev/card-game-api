@@ -26,11 +26,14 @@ public class CardGameService {
 
     private final InputValidator inputValidator;
 
-    public CardGameService(DeckOfCardsClient deckOfCardsClient, GameHistoryRepository gameHistoryRepository, PlayerRepository playerRepository, InputValidator inputValidator) {
+    private final DeckCalculatorService deckCalculatorService;
+
+    public CardGameService(DeckOfCardsClient deckOfCardsClient, GameHistoryRepository gameHistoryRepository, PlayerRepository playerRepository, InputValidator inputValidator, DeckCalculatorService deckCalculatorService) {
         this.deckOfCardsClient = deckOfCardsClient;
         this.gameHistoryRepository = gameHistoryRepository;
         this.playerRepository = playerRepository;
         this.inputValidator = inputValidator;
+        this.deckCalculatorService = deckCalculatorService;
     }
 
     /**
@@ -45,7 +48,7 @@ public class CardGameService {
     public GameHistory playGame(int numPlayers, int cardsPerHand) {
         inputValidator.validateInputs(numPlayers, cardsPerHand);
 
-        int requiredDecks = calculateDecks(numPlayers, cardsPerHand);
+        int requiredDecks = deckCalculatorService.calculateDecks(numPlayers, cardsPerHand);
         String deckId = deckOfCardsClient.createDeck(requiredDecks);
 
         List<Player> players = distributeCards(numPlayers, cardsPerHand, deckId);
@@ -53,17 +56,6 @@ public class CardGameService {
         String winner = determineWinner(players);
 
         return saveGameHistory(numPlayers, cardsPerHand, deckId, winner, players);
-    }
-
-    /**
-     * Calcula a quantidade de baralhos necessários com base no número de jogadores e cartas por jogador.
-     *
-     * @param numPlayers Número de jogadores
-     * @param cardsPerHand Número de cartas por jogador
-     * @return Número de baralhos necessários
-     */
-    private int calculateDecks(int numPlayers, int cardsPerHand) {
-        return (int) Math.ceil((double) (numPlayers * cardsPerHand) / 52);
     }
 
     /**
