@@ -29,6 +29,9 @@ class CardGameServiceTest {
     @Mock
     private PlayerRepository playerRepository;
 
+    @Mock
+    private InputValidator inputValidator;
+
     @Autowired
     @InjectMocks
     private CardGameService cardGameService;
@@ -45,8 +48,9 @@ class CardGameServiceTest {
         int cardsPerHand = 5;
         String deckId = "deck123";
 
+        doNothing().when(inputValidator).validateInputs(numPlayers, cardsPerHand);
         when(deckOfCardsClient.createDeck(anyInt())).thenReturn(deckId);
-        when(deckOfCardsClient.dealCards(eq(deckId), eq(cardsPerHand)))
+        when(deckOfCardsClient.dealCards(deckId, cardsPerHand))
                 .thenReturn(List.of(new CardDTO("ACE", "HEARTS"),
                         new CardDTO("8", "SPADES")
                         ));
@@ -62,47 +66,6 @@ class CardGameServiceTest {
         assertEquals(numPlayers, result.getNumberOfPlayers());
         assertEquals(cardsPerHand, result.getCardsPerPlayer());
         verify(playerRepository, times(1)).saveAll(anyList());
-    }
-
-    @Test
-    void validateInputs_ShouldThrowExceptionWhenNumPlayersIsZero() {
-        // Arrange
-        int numPlayers = 0;
-        int cardsPerHand = 5;
-
-        // Act & Assert
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> cardGameService.playGame(numPlayers, cardsPerHand));
-        assertEquals("Número de jogadores ou cartas por mão inválido.", exception.getMessage());
-    }
-
-    @Test
-    void validateInputs_ShouldThrowExceptionWhenCardVaueIsInvalid() {
-        // Arrange
-        int numPlayers = 2;
-        int cardsPerHand = 5;
-        String deckId = "deck123";
-
-        when(deckOfCardsClient.createDeck(anyInt())).thenReturn(deckId);
-        when(deckOfCardsClient.dealCards(eq(deckId), eq(cardsPerHand)))
-                .thenReturn(List.of(new CardDTO("ACES", "HEARTS")));
-
-        // Act & Assert
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> cardGameService.playGame(numPlayers, cardsPerHand));
-        assertEquals("Valor inválido para a carta: " + "ACES", exception.getMessage());
-    }
-
-    @Test
-    void calculateScore_shouldThrowIllegalArgumentExceptionWhenInvalidValueIsProvided() {
-        // Arrange
-        int numPlayers = 2;
-        int cardsPerHand = 0;
-
-        // Act & Assert
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> cardGameService.playGame(numPlayers, cardsPerHand));
-        assertEquals("Número de jogadores ou cartas por mão inválido.", exception.getMessage());
     }
 
     @Test

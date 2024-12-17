@@ -24,10 +24,13 @@ public class CardGameService {
     private final GameHistoryRepository gameHistoryRepository;
     private final PlayerRepository playerRepository;
 
-    public CardGameService(DeckOfCardsClient deckOfCardsClient, GameHistoryRepository gameHistoryRepository, PlayerRepository playerRepository) {
+    private final InputValidator inputValidator;
+
+    public CardGameService(DeckOfCardsClient deckOfCardsClient, GameHistoryRepository gameHistoryRepository, PlayerRepository playerRepository, InputValidator inputValidator) {
         this.deckOfCardsClient = deckOfCardsClient;
         this.gameHistoryRepository = gameHistoryRepository;
         this.playerRepository = playerRepository;
+        this.inputValidator = inputValidator;
     }
 
     /**
@@ -40,7 +43,7 @@ public class CardGameService {
      */
     @Transactional
     public GameHistory playGame(int numPlayers, int cardsPerHand) {
-        validateInputs(numPlayers, cardsPerHand);
+        inputValidator.validateInputs(numPlayers, cardsPerHand);
 
         int requiredDecks = calculateDecks(numPlayers, cardsPerHand);
         String deckId = deckOfCardsClient.createDeck(requiredDecks);
@@ -50,18 +53,6 @@ public class CardGameService {
         String winner = determineWinner(players);
 
         return saveGameHistory(numPlayers, cardsPerHand, deckId, winner, players);
-    }
-
-    /**
-     * Valida os parâmetros fornecidos para o número de jogadores e cartas por jogador.
-     *
-     * @param numPlayers Número de jogadores
-     * @param cardsPerHand Número de cartas por jogador
-     */
-    private void validateInputs(int numPlayers, int cardsPerHand) {
-        if (numPlayers < 1 || cardsPerHand < 1) {
-            throw new IllegalArgumentException("Número de jogadores ou cartas por mão inválido.");
-        }
     }
 
     /**
