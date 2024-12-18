@@ -1,15 +1,14 @@
 package br.com.card_game_api.service;
 
 import br.com.card_game_api.adapter.outbound.DeckOfCardsClient;
-import br.com.card_game_api.domain.*;
-import br.com.card_game_api.dto.CardDTO;
+import br.com.card_game_api.domain.GameHistory;
+import br.com.card_game_api.domain.Player;
 import br.com.card_game_api.repository.GameHistoryRepository;
 import br.com.card_game_api.repository.PlayerRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,15 +27,15 @@ public class CardGameService {
 
     private final DeckCalculatorService deckCalculatorService;
 
-    private final ScoreCalculatorService scoreCalculatorService;
+    private final CardDistributorService cardDistributorService;
 
-    public CardGameService(DeckOfCardsClient deckOfCardsClient, GameHistoryRepository gameHistoryRepository, PlayerRepository playerRepository, InputValidator inputValidator, DeckCalculatorService deckCalculatorService, ScoreCalculatorService scoreCalculatorService) {
+    public CardGameService(DeckOfCardsClient deckOfCardsClient, GameHistoryRepository gameHistoryRepository, PlayerRepository playerRepository, InputValidator inputValidator, DeckCalculatorService deckCalculatorService, CardDistributorService cardDistributorService) {
         this.deckOfCardsClient = deckOfCardsClient;
         this.gameHistoryRepository = gameHistoryRepository;
         this.playerRepository = playerRepository;
         this.inputValidator = inputValidator;
         this.deckCalculatorService = deckCalculatorService;
-        this.scoreCalculatorService = scoreCalculatorService;
+        this.cardDistributorService = cardDistributorService;
     }
 
     /**
@@ -54,65 +53,11 @@ public class CardGameService {
         int requiredDecks = deckCalculatorService.calculateDecks(numPlayers, cardsPerHand);
         String deckId = deckOfCardsClient.createDeck(requiredDecks);
 
-        List<Player> players = distributeCards(numPlayers, cardsPerHand, deckId);
+        List<Player> players = cardDistributorService.distributeCards(numPlayers, cardsPerHand, deckId);
 
         String winner = determineWinner(players);
 
         return saveGameHistory(numPlayers, cardsPerHand, deckId, winner, players);
-    }
-
-    /**
-     * Distribui as cartas para os jogadores e as armazena na lista de cada jogador.
-     *
-     * @param numPlayers Número de jogadores
-     * @param cardsPerHand Número de cartas por jogador
-     * @param deckId Identificador do baralho
-     * @return Lista de jogadores com suas cartas distribuídas
-     */
-    private List<Player> distributeCards(int numPlayers, int cardsPerHand, String deckId) {
-        List<Player> players = new ArrayList<>();
-
-        for (int i = 1; i <= numPlayers; i++) {
-            List<CardDTO> cardDTOs = deckOfCardsClient.dealCards(deckId, cardsPerHand);
-
-            int score = scoreCalculatorService.calculateScore(cardDTOs);
-
-            String handString = buildHandString(cardDTOs);
-
-            Player player = new Player("Jogador " + i, score, handString);
-            players.add(player);
-        }
-
-        return players;
-    }
-
-    /**
-     * Constrói a string representando a mão do jogador com cartas traduzidas.
-     *
-     * @param cardDTOs Lista de cartas do jogador
-     * @return String com as cartas traduzidas
-     */
-    private String buildHandString(List<CardDTO> cardDTOs) {
-        return cardDTOs.stream()
-                .map(card -> getTranslatedCardValue(card.getValue()) + " de " +
-                        TranslatedCardSuit.fromString(card.getSuit()).getTranslatedSuit())
-                .collect(Collectors.joining(", "));
-    }
-
-    /**
-     * Obtém o valor traduzido da carta.
-     * Se for um valor numérico, retorna o número como string.
-     *
-     * @param cardValue Valor da carta
-     * @return Valor traduzido da carta
-     */
-    private String getTranslatedCardValue(String cardValue) {
-        try {
-            TranslatedCardValue value = TranslatedCardValue.fromString(cardValue);
-            return value.getTranslatedValue();
-        } catch (IllegalArgumentException e) {
-            return cardValue;
-        }
     }
 
     /**

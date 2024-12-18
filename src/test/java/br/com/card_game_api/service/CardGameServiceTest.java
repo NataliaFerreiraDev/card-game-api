@@ -2,7 +2,7 @@ package br.com.card_game_api.service;
 
 import br.com.card_game_api.adapter.outbound.DeckOfCardsClient;
 import br.com.card_game_api.domain.GameHistory;
-import br.com.card_game_api.dto.CardDTO;
+import br.com.card_game_api.domain.Player;
 import br.com.card_game_api.repository.GameHistoryRepository;
 import br.com.card_game_api.repository.PlayerRepository;
 import org.junit.jupiter.api.Test;
@@ -37,7 +37,7 @@ class CardGameServiceTest {
     private DeckCalculatorService deckCalculatorService;
 
     @Mock
-    private ScoreCalculatorService scoreCalculatorService;
+    private CardDistributorService cardDistributorService;
 
     @Autowired
     @InjectMocks
@@ -49,16 +49,17 @@ class CardGameServiceTest {
         int numPlayers = 2;
         int cardsPerHand = 5;
         String deckId = "deck123";
+        List<Player> mockPlayers = List.of(
+                new Player("Jogador 1", 10, "10 de Copas"),
+                new Player("Jogador 2", 8, "8 de Espadas")
+        );
 
         doNothing().when(inputValidator).validateInputs(numPlayers, cardsPerHand);
         when(deckCalculatorService.calculateDecks(numPlayers, cardsPerHand)).thenReturn(1);
         when(deckOfCardsClient.createDeck(anyInt())).thenReturn(deckId);
-        when(deckOfCardsClient.dealCards(deckId, cardsPerHand))
-                .thenReturn(List.of(new CardDTO("ACE", "HEARTS"),
-                        new CardDTO("8", "SPADES")
-                        ));
+        when(cardDistributorService.distributeCards(numPlayers, cardsPerHand, deckId))
+                .thenReturn(mockPlayers);
 
-        when(scoreCalculatorService.calculateScore(anyList())).thenReturn(15);
         when(gameHistoryRepository.save(any(GameHistory.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -71,7 +72,6 @@ class CardGameServiceTest {
         assertEquals(cardsPerHand, result.getCardsPerPlayer());
         verify(playerRepository, times(1)).saveAll(anyList());
         verify(deckCalculatorService, times(1)).calculateDecks(numPlayers, cardsPerHand);
-        verify(scoreCalculatorService, times(numPlayers)).calculateScore(anyList());
     }
 
     @Test
