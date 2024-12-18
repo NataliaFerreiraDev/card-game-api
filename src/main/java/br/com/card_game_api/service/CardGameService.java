@@ -28,12 +28,15 @@ public class CardGameService {
 
     private final DeckCalculatorService deckCalculatorService;
 
-    public CardGameService(DeckOfCardsClient deckOfCardsClient, GameHistoryRepository gameHistoryRepository, PlayerRepository playerRepository, InputValidator inputValidator, DeckCalculatorService deckCalculatorService) {
+    private final ScoreCalculatorService scoreCalculatorService;
+
+    public CardGameService(DeckOfCardsClient deckOfCardsClient, GameHistoryRepository gameHistoryRepository, PlayerRepository playerRepository, InputValidator inputValidator, DeckCalculatorService deckCalculatorService, ScoreCalculatorService scoreCalculatorService) {
         this.deckOfCardsClient = deckOfCardsClient;
         this.gameHistoryRepository = gameHistoryRepository;
         this.playerRepository = playerRepository;
         this.inputValidator = inputValidator;
         this.deckCalculatorService = deckCalculatorService;
+        this.scoreCalculatorService = scoreCalculatorService;
     }
 
     /**
@@ -72,7 +75,7 @@ public class CardGameService {
         for (int i = 1; i <= numPlayers; i++) {
             List<CardDTO> cardDTOs = deckOfCardsClient.dealCards(deckId, cardsPerHand);
 
-            int score = calculateScore(cardDTOs);
+            int score = scoreCalculatorService.calculateScore(cardDTOs);
 
             String handString = buildHandString(cardDTOs);
 
@@ -110,20 +113,6 @@ public class CardGameService {
         } catch (IllegalArgumentException e) {
             return cardValue;
         }
-    }
-
-    /**
-     * Calcula a pontuação de um jogador com base nas cartas distribuídas.
-     * Cartas com valor A (Ás) são tratadas como 1, K (Rei) como 13, Q (Dama) como 12, J (Valete) como 11,
-     * e outros valores numéricos são convertidos diretamente.
-     *
-     * @param cardDTOs Lista de cartas do jogador
-     * @return A pontuação do jogador
-     */
-    private int calculateScore(List<CardDTO> cardDTOs) {
-        return cardDTOs.stream()
-                .mapToInt(CardValue::getScoreFromCardDTO)
-                .sum();
     }
 
     /**

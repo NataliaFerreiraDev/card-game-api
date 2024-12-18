@@ -36,6 +36,9 @@ class CardGameServiceTest {
     @Mock
     private DeckCalculatorService deckCalculatorService;
 
+    @Mock
+    private ScoreCalculatorService scoreCalculatorService;
+
     @Autowired
     @InjectMocks
     private CardGameService cardGameService;
@@ -48,13 +51,14 @@ class CardGameServiceTest {
         String deckId = "deck123";
 
         doNothing().when(inputValidator).validateInputs(numPlayers, cardsPerHand);
-        when(deckCalculatorService.calculateDecks(numPlayers, cardsPerHand)).thenReturn(1); // Mock do deckCalculatorService
+        when(deckCalculatorService.calculateDecks(numPlayers, cardsPerHand)).thenReturn(1);
         when(deckOfCardsClient.createDeck(anyInt())).thenReturn(deckId);
         when(deckOfCardsClient.dealCards(deckId, cardsPerHand))
                 .thenReturn(List.of(new CardDTO("ACE", "HEARTS"),
                         new CardDTO("8", "SPADES")
                         ));
 
+        when(scoreCalculatorService.calculateScore(anyList())).thenReturn(15);
         when(gameHistoryRepository.save(any(GameHistory.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -67,6 +71,7 @@ class CardGameServiceTest {
         assertEquals(cardsPerHand, result.getCardsPerPlayer());
         verify(playerRepository, times(1)).saveAll(anyList());
         verify(deckCalculatorService, times(1)).calculateDecks(numPlayers, cardsPerHand);
+        verify(scoreCalculatorService, times(numPlayers)).calculateScore(anyList());
     }
 
     @Test
