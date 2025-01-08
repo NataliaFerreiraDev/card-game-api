@@ -10,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Classe de serviço responsável pela lógica de negócio do jogo.
@@ -29,13 +28,16 @@ public class CardGameService {
 
     private final CardDistributorService cardDistributorService;
 
-    public CardGameService(DeckOfCardsClient deckOfCardsClient, GameHistoryRepository gameHistoryRepository, PlayerRepository playerRepository, InputValidator inputValidator, DeckCalculatorService deckCalculatorService, CardDistributorService cardDistributorService) {
+    private final GameResultService gameResultService;
+
+    public CardGameService(DeckOfCardsClient deckOfCardsClient, GameHistoryRepository gameHistoryRepository, PlayerRepository playerRepository, InputValidator inputValidator, DeckCalculatorService deckCalculatorService, CardDistributorService cardDistributorService, GameResultService gameResultService) {
         this.deckOfCardsClient = deckOfCardsClient;
         this.gameHistoryRepository = gameHistoryRepository;
         this.playerRepository = playerRepository;
         this.inputValidator = inputValidator;
         this.deckCalculatorService = deckCalculatorService;
         this.cardDistributorService = cardDistributorService;
+        this.gameResultService = gameResultService;
     }
 
     /**
@@ -55,25 +57,9 @@ public class CardGameService {
 
         List<Player> players = cardDistributorService.distributeCards(numPlayers, cardsPerHand, deckId);
 
-        String winner = determineWinner(players);
+        String winner = gameResultService.determineWinner(players);
 
         return saveGameHistory(numPlayers, cardsPerHand, deckId, winner, players);
-    }
-
-    /**
-     * Determina o vencedor do jogo com base nas pontuações dos jogadores.
-     * Em caso de empate, todos os jogadores com a maior pontuação são considerados vencedores.
-     *
-     * @param players Lista de jogadores
-     * @return O nome do vencedor ou vencedores (em caso de empate)
-     */
-    private String determineWinner(List<Player> players) {
-        int highestScore = players.stream().mapToInt(Player::getScore).max().orElse(0);
-
-        return players.stream()
-                .filter(player -> player.getScore() == highestScore)
-                .map(Player::getIdentifier)
-                .collect(Collectors.joining(", "));
     }
 
     /**

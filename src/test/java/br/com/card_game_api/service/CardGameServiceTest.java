@@ -39,6 +39,9 @@ class CardGameServiceTest {
     @Mock
     private CardDistributorService cardDistributorService;
 
+    @Mock
+    private GameResultService gameResultService;
+
     @Autowired
     @InjectMocks
     private CardGameService cardGameService;
@@ -59,6 +62,7 @@ class CardGameServiceTest {
         when(deckOfCardsClient.createDeck(anyInt())).thenReturn(deckId);
         when(cardDistributorService.distributeCards(numPlayers, cardsPerHand, deckId))
                 .thenReturn(mockPlayers);
+        when(gameResultService.determineWinner(anyList())).thenReturn("Player 1");
 
         when(gameHistoryRepository.save(any(GameHistory.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
