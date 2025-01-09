@@ -2,6 +2,7 @@ package br.com.card_game_api.service;
 
 import br.com.card_game_api.domain.GameHistory;
 import br.com.card_game_api.domain.Player;
+import br.com.card_game_api.exception.GameNotFoundException;
 import br.com.card_game_api.repository.GameHistoryRepository;
 import br.com.card_game_api.repository.PlayerRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -90,9 +91,9 @@ class GamePersistenceServiceTest {
         when(gameHistoryRepository.findById(gameId)).thenReturn(Optional.empty());
 
         // Act & Assert
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+        GameNotFoundException exception = assertThrows(GameNotFoundException.class,
                 () -> gamePersistenceService.getGameHistoryById(gameId));
-        assertEquals("Jogo não encontrado com ID: " + gameId, exception.getMessage());
+        assertEquals("Jogo com ID " + gameId + " não encontrado.", exception.getMessage());
     }
 
     @Test

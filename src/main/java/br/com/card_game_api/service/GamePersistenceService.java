@@ -2,6 +2,7 @@ package br.com.card_game_api.service;
 
 import br.com.card_game_api.domain.GameHistory;
 import br.com.card_game_api.domain.Player;
+import br.com.card_game_api.exception.GameNotFoundException;
 import br.com.card_game_api.repository.GameHistoryRepository;
 import br.com.card_game_api.repository.PlayerRepository;
 import org.springframework.stereotype.Service;
@@ -75,7 +76,7 @@ public class GamePersistenceService {
      */
     public GameHistory getGameHistoryById(Long gameId) {
         return gameHistoryRepository.findById(gameId)
-                .orElseThrow(() -> new IllegalArgumentException("Jogo não encontrado com ID: " + gameId));
+                .orElseThrow(() -> new GameNotFoundException("Jogo com ID " + gameId + " não encontrado."));
     }
 
     /**
