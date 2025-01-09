@@ -4,6 +4,7 @@ import br.com.card_game_api.domain.GameHistory;
 import br.com.card_game_api.dto.GameHistoryDTO;
 import br.com.card_game_api.dto.GameRequestDTO;
 import br.com.card_game_api.service.CardGameService;
+import br.com.card_game_api.service.GamePersistenceService;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
@@ -20,10 +21,12 @@ import java.util.List;
 public class GameController {
 
     private final CardGameService cardGameService;
+    private final GamePersistenceService gamePersistenceService;
     private final ModelMapper modelMapper;
 
-    public GameController(CardGameService cardGameService, ModelMapper modelMapper) {
+    public GameController(CardGameService cardGameService, GamePersistenceService gamePersistenceService, ModelMapper modelMapper) {
         this.cardGameService = cardGameService;
+        this.gamePersistenceService = gamePersistenceService;
         this.modelMapper = modelMapper;
     }
 
@@ -53,7 +56,7 @@ public class GameController {
      */
     @GetMapping("/history/{gameId}")
     public ResponseEntity<GameHistoryDTO> getGameHistory(@PathVariable Long gameId) {
-        GameHistory gameHistory = cardGameService.getGameHistoryById(gameId);
+        GameHistory gameHistory = gamePersistenceService.getGameHistoryById(gameId);
 
         // Converte GameHistory para GameHistoryDTO
         GameHistoryDTO gameHistoryDTO = modelMapper.map(gameHistory, GameHistoryDTO.class);
@@ -68,7 +71,7 @@ public class GameController {
      */
     @GetMapping("/history")
     public ResponseEntity<List<GameHistoryDTO>> getAllGameHistories() {
-        List<GameHistory> gameHistories = cardGameService.getAllGameHistories();
+        List<GameHistory> gameHistories = gamePersistenceService.getAllGameHistories();
 
         List<GameHistoryDTO> gameHistoryDTOs = gameHistories.stream()
                 .map(gameHistory -> modelMapper.map(gameHistory, GameHistoryDTO.class))

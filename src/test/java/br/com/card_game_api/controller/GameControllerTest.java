@@ -4,6 +4,7 @@ import br.com.card_game_api.domain.GameHistory;
 import br.com.card_game_api.dto.GameHistoryDTO;
 import br.com.card_game_api.dto.GameRequestDTO;
 import br.com.card_game_api.service.CardGameService;
+import br.com.card_game_api.service.GamePersistenceService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -24,6 +25,9 @@ class GameControllerTest {
 
     @Mock
     private CardGameService cardGameService;
+
+    @Mock
+    private GamePersistenceService gamePersistenceService;
 
     @Mock
     private ModelMapper modelMapper;
@@ -85,7 +89,7 @@ class GameControllerTest {
         // Defina o estado do DTO conforme necessário
 
         // Mock para o serviço de buscar o histórico do jogo
-        when(cardGameService.getGameHistoryById(gameId)).thenReturn(gameHistory);
+        when(gamePersistenceService.getGameHistoryById(gameId)).thenReturn(gameHistory);
 
         // Mock do ModelMapper para converter o GameHistory para GameHistoryDTO
         when(modelMapper.map(gameHistory, GameHistoryDTO.class)).thenReturn(gameHistoryDTO);
@@ -96,7 +100,7 @@ class GameControllerTest {
         // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode()); // Verifica se o status HTTP é 200 (OK)
         assertEquals(gameHistoryDTO, response.getBody()); // Verifica se o corpo da resposta contém o GameHistoryDTO esperado
-        verify(cardGameService).getGameHistoryById(gameId); // Verifica se o serviço foi chamado com o gameId correto
+        verify(gamePersistenceService).getGameHistoryById(gameId); // Verifica se o serviço foi chamado com o gameId correto
     }
 
     @Test
@@ -122,7 +126,7 @@ class GameControllerTest {
         List<GameHistoryDTO> gameHistoryDTOs = List.of(gameHistoryDTO1, gameHistoryDTO2);
 
         // Mock para o serviço de buscar todos os históricos de jogo
-        when(cardGameService.getAllGameHistories()).thenReturn(gameHistories);
+        when(gamePersistenceService.getAllGameHistories()).thenReturn(gameHistories);
 
         // Mock do ModelMapper para converter os GameHistories para GameHistoryDTOs
         when(modelMapper.map(gameHistory1, GameHistoryDTO.class)).thenReturn(gameHistoryDTO1);
@@ -134,7 +138,7 @@ class GameControllerTest {
         // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode()); // Verifica se o status HTTP é 200 (OK)
         assertEquals(gameHistoryDTOs, response.getBody()); // Verifica se o corpo da resposta contém a lista de GameHistoryDTOs esperada
-        verify(cardGameService).getAllGameHistories(); // Verifica se o serviço foi chamado para buscar todos os históricos
+        verify(gamePersistenceService).getAllGameHistories(); // Verifica se o serviço foi chamado para buscar todos os históricos
     }
 
 }
